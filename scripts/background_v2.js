@@ -4,7 +4,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 const redirectUrls = [
     ['abs.twimg.com/favicons/twitter.3.ico', 'images/logo32_new.png'],
-    ['abs.twimg.com/favicons/twitter-pip.3.ico', 'images/logo32_new_notification.png'],
+    ['abs.twimg.com/favicons/twitter-pip.3.ico', 'images/logo32_new.png'],
     ['abs.twimg.com/responsive-web/client-web/icon-default.', 'images/logo512.png'],
     ['abs.twimg.com/responsive-web/client-web/icon-default-maskable.', 'images/logo192.png'],
     ['abs.twimg.com/responsive-web/client-web/icon-default-large.', 'images/logo512.png'],
