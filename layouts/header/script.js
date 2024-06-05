@@ -540,32 +540,12 @@ let userDataFunction = async user => {
             dms = 0;
         }
         total = dms + notifs;
-        if(dms > 0) {
-            dmsElement.hidden = false;
-            dmsElement.innerText = dms > 20 ? '20+' : dms;
-        } else {
-            dmsElement.hidden = true;
-        }
+        dmsElement.hidden = true;
         if(notifs > 0) {
             notifElement.hidden = false;
             notifElement.innerText = notifs > 20 ? '20+' : notifs;
         } else {
             notifElement.hidden = true;
-        }
-        icon.href = total > 0 ? chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}_notification.png`) : chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}.png`);
-        if(total > 0) {
-            let newTitle = document.title;
-            if(document.title.startsWith('(')) {
-                newTitle = document.title.split(') ')[1];
-            }
-            newTitle = `(${total > 40 ? '40+' : total}) ${newTitle}`;
-            if(document.title !== newTitle) {
-                document.title = newTitle;
-            }
-        } else {
-            if(document.title.startsWith('(')) {
-                document.title = document.title.split(') ').slice(1).join(') ');
-            }
         }
     }
     async function updateAccounts() {
