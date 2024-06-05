@@ -66,15 +66,6 @@ async function updateNotifications(options = { mode: 'rewrite', quiet: false }) 
                 API.notifications.markAsRead(cursorTop);
                 if(windowFocused) {
                     chrome.storage.local.remove(['unreadCount'], () => {});
-                    document.getElementById('site-icon').href = chrome.runtime.getURL(`images/logo32${vars.useNewIcon ? '_new' : ''}_notification.png`);
-                    let newTitle = document.title;
-                    if(document.title.startsWith('(')) {
-                        newTitle = document.title.split(') ')[1];
-                    }
-                    newTitle = `(${data.unreadNotifications}) ${newTitle}`;
-                    if(document.title !== newTitle) {
-                        document.title = newTitle;
-                    }
                     notificationBus.postMessage({type: 'markAsRead', cursor: cursorTop});
                 }
             }, 500);
