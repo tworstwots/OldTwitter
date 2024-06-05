@@ -42,6 +42,7 @@ If you like this extension please consider donating:
 - Lot of hotkeys
 - Mobile support with Kiwi Browser or Firefox
 - Custom CSS support
+- No annoying message notifications
 
 ## Manual installation
 
