@@ -1,5 +1,7 @@
 let solveId = 0;
 let solveCallbacks = {};
+let solveQueue = []
+let solverReady = false;
 let solverErrored = false;
 
 let solverIframe = document.createElement('iframe');
@@ -26,16 +28,16 @@ function solveChallenge(path, method) {
         }
         let id = solveId++;
         solveCallbacks[id] = { resolve, reject, time: Date.now() };
-        if(solverIframe && solverIframe.contentWindow) {
-            solverIframe.contentWindow.postMessage({ action: 'solve', id, path, method }, '*');
-            setTimeout(() => {
-                if(solveCallbacks[id]) {
-                    solveCallbacks[id].reject('Solver timed out');
-                    delete solveCallbacks[id];
-                }
-            }, 1750);
+        if(!solverIframe || !solverIframe.contentWindow || !solverReady) {
+            solveQueue.push({ id, path, method })
         } else {
-            reject('Solver iframe not ready');
+            solverIframe.contentWindow.postMessage({ action: 'solve', id, path, method }, '*');
+            // setTimeout(() => {
+            //     if(solveCallbacks[id]) {
+            //         solveCallbacks[id].reject('Solver timed out');
+            //         delete solveCallbacks[id];
+            //     }
+            // }, 1750);
         }
     });
 }
@@ -61,8 +63,14 @@ window.addEventListener('message', e => {
             solveCallbacks[id].reject('Solver errored during initialization');
             delete solveCallbacks[id];
         }
+        alert(`There was an error in initializing security header generator: ${data.error}. OldTwitter doesn't allow unsigned requests anymore for your account security. Currently it's unknown what causes this to happen, try reloading the page.`);
         console.error('Error initializing solver:');
         console.error(data.error);
+    } else if(data.action === 'ready') {
+        solverReady = true;
+        for (let task of solveQueue) {
+            solverIframe.contentWindow.postMessage({ action: 'solve', id: task.id, path: task.path, method: task.method }, '*')
+        }
     }
 });
 
@@ -84,13 +92,13 @@ fetch = async function(url, options) {
         url = `https://${location.host}${url}`;
     }
     let parsedUrl = new URL(url);
-    try {
+    // try {
         let solved = await solveChallenge(parsedUrl.pathname, options.method ? options.method.toUpperCase() : 'GET');
         options.headers['x-client-transaction-id'] = solved;
-    } catch (e) {
-        console.error(`Error solving challenge for ${url}:`);
-        console.error(e);
-    }
+    // } catch (e) {
+    //     console.error(`Error solving challenge for ${url}:`);
+    //     console.error(e);
+    // }
     if(options.method && options.method.toUpperCase() === 'POST' && typeof options.body === 'string') {
         options.headers['Content-Length'] = options.body.length;
     }
