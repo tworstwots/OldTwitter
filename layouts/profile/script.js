@@ -1,3 +1,74 @@
+/*
+/**
+ * @typedef {Object} CSSVariable
+ * @property {string} value - The value of the CSS variable.
+ */
+
+/**
+ * CSSVariableManager class to manage CSS variables.
+ */
+class CSSVariableManager {
+    /**
+     * @type {Object.<string, CSSVariable>}
+    */
+    #vars; // this is unused rn but could be useful in the future
+    /**
+     * Creates an instance of CSSVariableManager.
+    */
+    constructor() {
+        this.#vars = {};
+    }
+
+    /**
+     * Updates a CSS variable.
+     * @param {string} name - The name of the CSS variable.
+     * @param {string} value - The value of the CSS variable.
+    */
+    updateVar(name, value) {
+        this.#vars[name] = value;
+    }
+
+    getVar(name) {
+        return this.#vars[name];
+    }
+
+    get vars() {
+        return this.#vars;
+    }
+
+    runLoop() {
+        const root = document.documentElement;
+        for(let i in this.#vars) {
+            if(root.style.getPropertyValue(i) !== this.#vars[i]) {
+                root.style.setProperty(i, this.#vars[i]);
+            }
+        }
+        requestAnimationFrame(() => this.runLoop());
+    }
+}
+
+const manager = new CSSVariableManager();
+
+let lastX = 0;
+let lastY = 0;
+
+manager.runLoop();
+
+window.addEventListener('scroll', (e) => {
+    manager.updateVar('--scroll-y', window.scrollY + 'px');
+});
+
+window.addEventListener('mousemove', (e) => {
+    if(e.clientX !== lastX) {
+        manager.updateVar('--mouse-x', e.clientX + 'px');
+        lastX = e.clientX;
+    }
+    if(e.clientY !== lastY) {
+        manager.updateVar('--mouse-y', e.clientY + 'px');
+        lastY = e.clientY;
+    }
+});
+
 let user = {};
 let pageUser = {};
 let timeline = {
@@ -196,28 +267,63 @@ function updateUserData() {
             API.user.get(user_handle, false),
             API.account.verifyCredentials()
         ]).catch(e => {
-            document.getElementById('loading-box').hidden = false;
-            if(String(e).includes('User has been suspended.')) {
-                return document.getElementById('loading-box-error').innerHTML = html`${LOC.user_was_suspended.message}<br><a href="/home">${LOC.go_homepage.message}</a>`;
-            }
             if(String(e).includes("reading 'result'")) {
-                return document.getElementById('loading-box-error').innerHTML = html`${LOC.user_was_not_found.message}<br><a href="/home">${LOC.go_homepage.message}</a>`;
+                document.getElementById('loading-box').hidden = true;
+                document.getElementById('profile-name').innerText = `@${user_handle}`;
+                document.getElementById('timeline').innerHTML = html`<div class="unable_load_timeline" dir="auto" style="padding: 50px;color: var(--darker-gray); font-size: 20px;"><h2>${LOC.nonexistent_user.message}</h2><p style="font-size: 15px;" href="/${pageUser.screen_name}">${LOC.nonexistent_user_desc.message.replaceAll("$SCREEN_NAME$",pageUser.screen_name)}</p></div>`;
+                document.getElementById('trends').hidden = true;
+                document.getElementById('profile-nav-center-cell').style.display = 'none'; // ???
+                document.getElementById('profile-banner-sticky').style.backgroundColor = 'var(--background-color)';
+                document.getElementById('wtf').hidden = true;
+                document.getElementById('profile-nav').style.boxShadow = 'none';
+                document.getElementById('profile-avatar').src = chrome.runtime.getURL(`images/default_profile_images/default_profile_0_normal.png`);
+                return;
             }
+            if(String(e).includes('User has been suspended.')) {
+                document.getElementById('loading-box').hidden = true;
+                document.getElementById('profile-name').innerText = `@${user_handle}`;
+                document.getElementById('timeline').innerHTML = html`<div class="unable_load_timeline" dir="auto" style="padding: 50px;color: var(--darker-gray); font-size: 20px;"><h2>${LOC.suspended_user.message}</h2><p style="font-size: 15px;" href="/${pageUser.screen_name}">${LOC.suspended_user_desc.message.replaceAll("$SCREEN_NAME$",pageUser.screen_name)}</p></div>`;
+                document.getElementById('trends').hidden = true;
+                document.getElementById('profile-nav-center-cell').style.display = 'none'; // ???
+                document.getElementById('profile-banner-sticky').style.backgroundColor = 'var(--background-color)';
+                document.getElementById('wtf').hidden = true;
+                document.getElementById('profile-nav').style.boxShadow = 'none';
+                document.getElementById('profile-avatar').src = chrome.runtime.getURL(`images/default_profile_images/default_profile_0_normal.png`);
+                return;
+            }
+            document.getElementById('loading-box').hidden = false;
             return document.getElementById('loading-box-error').innerHTML = html`${String(e)}.<br><a href="/home">${LOC.go_homepage.message}</a>`;
         });
         if(oldUser.reason) {
             let e = oldUser.reason;
             if(String(e).includes('User has been suspended.')) {
-                document.getElementById('loading-box').hidden = false;
-                return document.getElementById('loading-box-error').innerHTML = html`${LOC.user_was_suspended.message}<br><a href="/home">${LOC.go_homepage.message}</a>`;
+                document.getElementById('loading-box').hidden = true;
+                document.getElementById('profile-name').innerText = `@${user_handle}`;
+                document.getElementById('timeline').innerHTML = html`<div class="unable_load_timeline" dir="auto" style="padding: 50px;color: var(--darker-gray); font-size: 20px;"><h2>${LOC.suspended_user.message}</h2><p style="font-size: 15px;" href="/${pageUser.screen_name}">${LOC.suspended_user_desc.message.replaceAll("$SCREEN_NAME$",pageUser.screen_name)}</p></div>`;
+                document.getElementById('trends').hidden = true;
+                document.getElementById('profile-nav-center-cell').style.display = 'none'; // ???
+                document.getElementById('profile-banner-sticky').style.backgroundColor = 'var(--background-color)';
+                document.getElementById('wtf').hidden = true;
+                document.getElementById('profile-nav').style.boxShadow = 'none';
+                document.getElementById('profile-avatar').src = chrome.runtime.getURL(`images/default_profile_images/default_profile_0_normal.png`);
+                return;
             }
         }
         if(pageUserData.reason) {
             let e = pageUserData.reason;
-            document.getElementById('loading-box').hidden = false;
             if(String(e).includes("reading 'result'")) {
-                return document.getElementById('loading-box-error').innerHTML = html`${LOC.user_was_not_found.message}<br><a href="/home">${LOC.go_homepage.message}</a>`;
+                document.getElementById('loading-box').hidden = true;
+                document.getElementById('profile-name').innerText = `@${user_handle}`;
+                document.getElementById('timeline').innerHTML = html`<div class="unable_load_timeline" dir="auto" style="padding: 50px;color: var(--darker-gray); font-size: 20px;"><h2>${LOC.nonexistent_user.message}</h2><p style="font-size: 15px;" href="/${pageUser.screen_name}">${LOC.nonexistent_user_desc.message.replaceAll("$SCREEN_NAME$",pageUser.screen_name)}</p></div>`;
+                document.getElementById('trends').hidden = true;
+                document.getElementById('profile-nav-center-cell').style.display = 'none'; // ???
+                document.getElementById('profile-banner-sticky').style.backgroundColor = 'var(--background-color)';
+                document.getElementById('wtf').hidden = true;
+                document.getElementById('profile-nav').style.boxShadow = 'none';
+                document.getElementById('profile-avatar').src = chrome.runtime.getURL(`images/default_profile_images/default_profile_0_normal.png`);
+                return;
             }
+            document.getElementById('loading-box').hidden = false;
             return document.getElementById('loading-box-error').innerHTML = html`${String(e)}.<br><a href="/home">${LOC.go_homepage.message}</a>`;
         }
         followersYouFollowData = followersYouFollowData.value;

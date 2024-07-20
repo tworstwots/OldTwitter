@@ -485,6 +485,7 @@ let userDataFunction = async user => {
         root.style.setProperty('--birthday-icon', '"\\f092"');
         root.style.setProperty('--joined-icon', '"\\f203"');
     }
+    console.log(vars);
     if(vars.heartsNotStars) {
         root.style.setProperty('--favorite-icon-content', '"\\f148"');
         root.style.setProperty('--favorite-icon-content-notif', '"\\f015"');
@@ -2844,6 +2845,13 @@ let userDataFunction = async user => {
                         return;
                     }
                 }
+                const tlUsers = data.list.filter(i => i.type === 'tweet').map(i => i.user.id_str);
+                if (typeof linkColors !== "undefined") {
+                    let linkData = await getLinkColors(tlUsers);
+                    if(linkData) for(let i in linkData) {
+                        linkColors[linkData[i].id] = linkData[i].color;
+                    }
+                }
                 if(options.mode === 'append' || options.mode === 'rewrite') {
                     cursorBottom = data.cursorBottom;
                 }
@@ -2987,7 +2995,7 @@ setInterval(() => {
                 userDataFunction(u);
             });
         }
-    }, 1750);
+    }, 0); // fixes a bug where user info doesn't load on the profile page occasionally
     setTimeout(() => {
         let version = document.getElementById('oldtwitter-version');
         let version2 = document.getElementById('oldtwitter-version-left');
