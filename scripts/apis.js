@@ -1607,7 +1607,7 @@ const API = {
                         return reject(data.errors[0].message);
                     }
                     resolve(data);
-                    if(screen_name === 'd1mden') {
+                    if(screen_name === 'dimden') {
                         chrome.storage.local.set({'followingDeveloper': true}, () => {});
                     }
                     chrome.storage.local.get(['sortedFollowers'], async d => {
@@ -1650,7 +1650,7 @@ const API = {
                         return reject(data.errors[0].message);
                     }
                     resolve(data);
-                    if(screen_name === 'd1mden') {
+                    if(screen_name === 'dimden') {
                         chrome.storage.local.set({'followingDeveloper': false}, () => {});
                     }
                     chrome.storage.local.get(['sortedFollowers'], async d => {
@@ -2731,10 +2731,11 @@ const API = {
                 fetch(`/i/api/graphql/ojPdsZsimiJrUGLR1sjUtA/CreateRetweet`, {
                     method: 'POST',
                     headers: {
-                        "authorization": OLDTWITTER_CONFIG.public_token,
+                        "authorization": "Bearer AAAAAAAAAAAAAAAAAAAAAFQODgEAAAAAVHTp76lzh3rFzcHbmHVvQxYYpTw%3DckAlMINMjmCwxUcaXbAN4XqJVdgMJaHqNOFgPMK0zN1qLqLQCF",
                         "x-csrf-token": OLDTWITTER_CONFIG.csrf,
                         "x-twitter-auth-type": "OAuth2Session",
-                        "content-type": "application/json; charset=utf-8"
+                        "content-type": "application/json",
+                        "x-twitter-client-language": LANGUAGE ? LANGUAGE : navigator.language ? navigator.language : "en"
                     },
                     credentials: "include",
                     body: JSON.stringify({"variables":{"tweet_id":id,"dark_request":false},"queryId":"ojPdsZsimiJrUGLR1sjUtA"})

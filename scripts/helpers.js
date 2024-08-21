@@ -1593,6 +1593,8 @@ const sizeFunctions = [
     (w, h) => calculateSize(w, h, 225, 400),
     (w, h) => calculateSize(w, h, 225, 400),
     (w, h) => calculateSize(w, h, 225, 400),
+    (w, h) => calculateSize(w, h, 225, 400),
+    (w, h) => calculateSize(w, h, 225, 400),
     (w, h) => calculateSize(w, h, 225, 400)
 ];
 
@@ -1601,6 +1603,8 @@ const quoteSizeFunctions = [
     (w, h) => calculateSize(w, h, 400, 400),
     (w, h) => calculateSize(w, h, 200, 400),
     (w, h) => calculateSize(w, h, 125, 200),
+    (w, h) => calculateSize(w, h, 100, 150),
+    (w, h) => calculateSize(w, h, 100, 150),
     (w, h) => calculateSize(w, h, 100, 150),
     (w, h) => calculateSize(w, h, 100, 150),
     (w, h) => calculateSize(w, h, 100, 150),
@@ -3029,6 +3033,7 @@ async function appendTweet(t, timelineContainer, options = {}) {
                     tweetData = await API.tweet.retweet(t.id_str);
                 } catch (e) {
                     console.error(e);
+                    alert(e);
                     return;
                 }
                 if (!tweetData) {
@@ -3790,9 +3795,9 @@ function renderNotification(n, options = {}) {
                 let user = n.users[e.ref.user.id];
                 notificationHeader = Array.from(notificationHeader);
                 notificationHeader = arrayInsert(notificationHeader, e.toIndex+additionalLength, '</a>');
-                notificationHeader = arrayInsert(notificationHeader, e.fromIndex+additionalLength, `<a href="/d1mden">`);
+                notificationHeader = arrayInsert(notificationHeader, e.fromIndex+additionalLength, `<a href="/dimden">`);
                 notificationHeader = notificationHeader.join('');
-                additionalLength += `<a href="/d1mden"></a>`.length;
+                additionalLength += `<a href="/dimden"></a>`.length;
                 let mi = 0;
                 let newText = notificationHeader.replace(aRegex, (_, m) => {
                     if(mi++ !== matches) return _;
